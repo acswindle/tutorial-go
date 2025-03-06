@@ -1,12 +1,21 @@
 package templates
 
-templ Home() {
+templ base() {
 	<html>
 		<head>
 			<title>Home</title>
+			<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css"/>
+			<script src="https://unpkg.com/htmx.org@2.0.4"></script>
+			<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
 		</head>
 		<body>
-			<h1>Home</h1>
+			{ children... }
 		</body>
 	</html>
+}
+
+templ Home() {
+	@base() {
+		<h1>Home</h1>
+	}
 }
