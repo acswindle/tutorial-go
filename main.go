@@ -39,6 +39,16 @@ func main() {
 		templates.Home().Render(r.Context(), w)
 	})
 
+	// Render the sign up page
+	http.HandleFunc("/auth/signup", func(w http.ResponseWriter, r *http.Request) {
+		templates.SignUp().Render(r.Context(), w)
+	})
+
+	// Render the login page
+	http.HandleFunc("/auth/login", func(w http.ResponseWriter, r *http.Request) {
+		templates.LogIn().Render(r.Context(), w)
+	})
+
 	// Start the server
 	println("Listening on port 8080")
 	http.ListenAndServe(":8080", nil)
