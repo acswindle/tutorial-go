@@ -1,21 +1,72 @@
 package templates
 
 templ base() {
-	<html>
-		<head>
-			<title>Home</title>
-			<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css"/>
-			<script src="https://unpkg.com/htmx.org@2.0.4"></script>
-			<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
-		</head>
-		<body>
-			{ children... }
-		</body>
-	</html>
+<html>
+
+<head>
+  <title>Go-Tutorials</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css" />
+  <link rel="stylesheet" href="/static/style.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/@imacrayon/alpine-ajax@0.12.0/dist/cdn.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
+</head>
+
+<body>
+  <div x-data="{ dropdownOpen: false }" class="sticky-top">
+    <nav class="navbar" role="navigation" aria-label="main navigation">
+      <div class="navbar-brand">
+        <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample"
+          @click="dropdownOpen = !dropdownOpen;">
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+        </a>
+      </div>
+      <div id="navbarBasicExample" class="navbar-menu">
+        <div class="navbar-start">
+          <a class="navbar-item" href="/">
+            Home
+          </a>
+        </div>
+        <div class="navbar-end">
+          <div class="navbar-item">
+            <div class="buttons">
+              @authButtons()
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+    <div class="drop-down" x-show="dropdownOpen">
+      <div>
+        @authButtons()
+      </div>
+    </div>
+  </div>
+  <main id="main-content" class="container">
+    { children... }
+  </main>
+</body>
+
+</html>
+}
+
+templ authButtons() {
+<a class="button is-primary" href="/auth/signup" x-target.replace.push="main-content">
+  <strong>Sign up</strong>
+</a>
+<a class="button is-light" href="/auth/login" x-target.replace.push="main-content">
+  Log in
+</a>
 }
 
 templ Home() {
-	@base() {
-		<h1>Home</h1>
-	}
+@base() {
+@pageTitle("Home")
+}
+}
+
+templ pageTitle(title string) {
+<h1 class="is-size-2 has-text-weight-bold has-text-centered">{ title }</h1>
 }
