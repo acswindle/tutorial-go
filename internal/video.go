@@ -17,11 +17,12 @@ func VideoRoutes(ctx context.Context, queries *database.Queries) {
 			http.Error(w, "videoId not set", http.StatusBadRequest)
 			return
 		}
-		userId := ValidateToken(w, r)
-		if userId == 0 {
+		token, err := ValidateToken(w, r)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusUnauthorized)
 			return
 		}
-		url, err := queries.GetVidoeUrl(ctx, database.GetVidoeUrlParams{ID: int32(videoId), UserID: userId})
+		url, err := queries.GetVidoeUrl(ctx, database.GetVidoeUrlParams{ID: int32(videoId), UserID: token.UserId})
 		if err != nil {
 			http.Error(w, "video not found", http.StatusNotFound)
 			return

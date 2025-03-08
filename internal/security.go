@@ -2,8 +2,13 @@ package internal
 
 import (
 	"context"
+	"crypto/aes"
+	"crypto/cipher"
+	"crypto/pbkdf2"
 	"crypto/rand"
+	"crypto/sha256"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"strconv"
@@ -30,13 +35,70 @@ type ResponseToken struct {
 }
 
 type JWTClaims struct {
-	UserId int32 `json:"user_id"`
-	Exp    int64 `json:"exp"`
-	Iat    int64 `json:"iat"`
-	Auth   bool  `json:"authorized"`
+	UserId    int32  `json:"user_id"`
+	Exp       int64  `json:"exp"`
+	Iat       int64  `json:"iat"`
+	Auth      bool   `json:"authorized"`
+	DeriveKey []byte `json:"deriveKey"`
+	jwt.RegisteredClaims
 }
 
-func generateJWT(userId int32) (ResponseToken, error) {
+// deriveKey generates an encryption key from a password and salt
+func deriveKey(password []byte, salt []byte) []byte {
+	// PBKDF2 with SHA256, 100,000 iterations, 32-byte key (AES-256)
+	return pbkdf2.Key(password, salt, 100000, 32, sha256.New)
+}
+
+// EncryptedData represents data stored in the database
+type EncryptedData struct {
+	Nonce      []byte
+	Ciphertext []byte
+}
+
+// encrypt encrypts plaintext using AES-GCM
+func encrypt(key, plaintext []byte) (EncryptedData, error) {
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		return EncryptedData{}, err
+	}
+
+	gcm, err := cipher.NewGCM(block)
+	if err != nil {
+		return EncryptedData{}, err
+	}
+
+	nonce := make([]byte, gcm.NonceSize())
+	if _, err := io.ReadFull(rand.Reader, nonce); err != nil {
+		return EncryptedData{}, err
+	}
+
+	ciphertext := gcm.Seal(nil, nonce, plaintext, nil)
+	return EncryptedData{
+		Nonce:      nonce,
+		Ciphertext: ciphertext,
+	}, nil
+}
+
+// decrypt decrypts ciphertext using AES-GCM
+func decrypt(key []byte, data EncryptedData) ([]byte, error) {
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		return nil, err
+	}
+
+	gcm, err := cipher.NewGCM(block)
+	if err != nil {
+		return nil, err
+	}
+
+	plaintext, err := gcm.Open(nil, data.Nonce, data.Ciphertext, nil)
+	if err != nil {
+		return nil, err
+	}
+	return plaintext, nil
+}
+
+func generateJWT(user database.GetCredentialsRow) (ResponseToken, error) {
 	jwtSecret, secretSet := os.LookupEnv("JWT_SECRET")
 	if !secretSet {
 		return ResponseToken{}, fmt.Errorf("JWT_SECRET not set")
@@ -45,15 +107,19 @@ func generateJWT(userId int32) (ResponseToken, error) {
 	if !setExp {
 		return ResponseToken{}, fmt.Errorf("JWT_EXPIRE_TIME not set")
 	}
+	if !setExp {
+		return ResponseToken{}, fmt.Errorf("JWT_EXPIRE_TIME not set")
+	}
 	expireTime, err := strconv.Atoi(jwtExpireTime)
 	if err != nil {
 		return ResponseToken{}, fmt.Errorf("JWT_EXPIRE_TIME must be an integer")
 	}
 	claims := jwt.MapClaims{
-		"user_id":    userId,
+		"user_id":    user.ID,
 		"exp":        time.Now().Add(time.Second * time.Duration(expireTime)).Unix(),
 		"iat":        time.Now().Unix(),
 		"authorized": true,
+		"deriveKey":  deriveKey(user.Password, user.Salt),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString([]byte(jwtSecret))
@@ -67,18 +133,19 @@ func generateJWT(userId int32) (ResponseToken, error) {
 	}, nil
 }
 
-func ValidateToken(w http.ResponseWriter, r *http.Request) int32 {
+func ValidateToken(w http.ResponseWriter, r *http.Request) (JWTClaims, error) {
 	jwtSecret, secretSet := os.LookupEnv("JWT_SECRET")
 	if !secretSet {
 		http.Error(w, "JWT_SECRET not set", http.StatusInternalServerError)
-		return 0
+		return JWTClaims{}, fmt.Errorf("JWT_SECRET not set")
 	}
 	auth, err := r.Cookie("token")
 	if err != nil {
 		http.Error(w, "token not set", http.StatusUnauthorized)
-		return 0
+		return JWTClaims{}, fmt.Errorf("token not set")
 	}
-	tokenClaims, err := jwt.Parse(auth.Value, func(token *jwt.Token) (interface{}, error) {
+	var tokenClaims JWTClaims
+	token, err := jwt.ParseWithClaims(auth.Value, &tokenClaims, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
@@ -86,13 +153,14 @@ func ValidateToken(w http.ResponseWriter, r *http.Request) int32 {
 	})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return 0
+		return JWTClaims{}, err
 	}
-	if claims, ok := tokenClaims.Claims.(jwt.MapClaims); ok && tokenClaims.Valid {
-		return int32(claims["user_id"].(float64))
+	if !token.Valid {
+		http.Error(w, "token not valid", http.StatusUnauthorized)
+		return JWTClaims{}, fmt.Errorf("token not valid")
 	}
 	http.Error(w, "token not valid", http.StatusUnauthorized)
-	return 0
+	return tokenClaims, nil
 }
 
 func SecurityRoutes(ctx context.Context, queries *database.Queries) {
@@ -184,7 +252,7 @@ func SecurityRoutes(ctx context.Context, queries *database.Queries) {
 			http.Error(w, err.Error(), http.StatusUnauthorized)
 			return
 		}
-		token, err := generateJWT(user.ID)
+		token, err := generateJWT(user)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -202,12 +270,6 @@ func SecurityRoutes(ctx context.Context, queries *database.Queries) {
 
 		// Redirect to the home page
 		http.Redirect(w, r, "/", http.StatusSeeOther)
-	})
-
-	http.HandleFunc("GET /validate", func(w http.ResponseWriter, r *http.Request) {
-		if username := ValidateToken(w, r); username != 0 {
-			fmt.Fprint(w, username)
-		}
 	})
 
 	// Render the login page
