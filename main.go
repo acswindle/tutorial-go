@@ -57,6 +57,7 @@ func main() {
 	})
 
 	internal.SecurityRoutes(ctx, queries)
+	internal.VideoRoutes(ctx, queries)
 	// Start the server
 	println("Listening on port 8080")
 	http.ListenAndServe(":8080", nil)
