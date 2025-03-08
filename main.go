@@ -36,7 +36,7 @@ func main() {
 
 	// Render the home page
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		templates.Home().Render(r.Context(), w)
+		templates.Home(false).Render(r.Context(), w)
 	})
 
 	// Render the sign up page
@@ -47,6 +47,11 @@ func main() {
 	// Render the login page
 	http.HandleFunc("/auth/login", func(w http.ResponseWriter, r *http.Request) {
 		templates.LogIn().Render(r.Context(), w)
+	})
+
+	// Render the course home page
+	http.HandleFunc("/course", func(w http.ResponseWriter, r *http.Request) {
+		templates.CourseHome(false).Render(r.Context(), w)
 	})
 
 	// Start the server

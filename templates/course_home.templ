@@ -1,0 +1,81 @@
+package templates;
+
+templ courseLeftAside() {
+	<div>
+		<ul>
+			<li><a href="#">Link 1</a> </li>
+			<li><a href="#">Link 2</a> </li>
+			<li><a href="#">Link 3</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+			<li><a href="#">Link 4</a> </li>
+		</ul>
+	</div>
+}
+
+templ CourseHome(loggedIn bool) {
+	@base(loggedIn, courseLeftAside(), blankAside()) {
+		@pageTitle("Course Home")
+	}
+}

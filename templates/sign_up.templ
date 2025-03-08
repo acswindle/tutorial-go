@@ -1,16 +1,16 @@
 package templates;
 
 templ SignUp() {
-@base() {
-@pageTitle("Sign Up")
-<form>
-  <label for="username" class="label">Username</label>
-  <input type="text" name="username" class="input" />
-  <label for="email" class="label">Email</label>
-  <input type="email" name="email" class="input" />
-  <label for="password" class="label">Password</label>
-  <input type="password" name="password" class="input" />
-  <button type="submit" class="button is-primary">Sign Up</button>
-</form>
-}
+	@base(false, blankAside(), blankAside()) {
+		@pageTitle("Sign Up")
+		<form x-cloak>
+			<label for="username" class="label">Username</label>
+			<input type="text" name="username" class="input"/>
+			<label for="email" class="label">Email</label>
+			<input type="email" name="email" class="input"/>
+			<label for="password" class="label">Password</label>
+			<input type="password" name="password" class="input"/>
+			<button type="submit" class="button is-primary">Sign Up</button>
+		</form>
+	}
 }

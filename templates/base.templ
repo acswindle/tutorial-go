@@ -1,72 +1,103 @@
 package templates
 
-templ base() {
-<html>
-
-<head>
-  <title>Go-Tutorials</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css" />
-  <link rel="stylesheet" href="/static/style.css" />
-  <script defer src="https://cdn.jsdelivr.net/npm/@imacrayon/alpine-ajax@0.12.0/dist/cdn.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
-</head>
-
-<body>
-  <div x-data="{ dropdownOpen: false }" class="sticky-top">
-    <nav class="navbar" role="navigation" aria-label="main navigation">
-      <div class="navbar-brand">
-        <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample"
-          @click="dropdownOpen = !dropdownOpen;">
-          <span aria-hidden="true"></span>
-          <span aria-hidden="true"></span>
-          <span aria-hidden="true"></span>
-          <span aria-hidden="true"></span>
-        </a>
-      </div>
-      <div id="navbarBasicExample" class="navbar-menu">
-        <div class="navbar-start">
-          <a class="navbar-item" href="/">
-            Home
-          </a>
-        </div>
-        <div class="navbar-end">
-          <div class="navbar-item">
-            <div class="buttons">
-              @authButtons()
-            </div>
-          </div>
-        </div>
-      </div>
-    </nav>
-    <div class="drop-down" x-show="dropdownOpen">
-      <div>
-        @authButtons()
-      </div>
-    </div>
-  </div>
-  <main id="main-content" class="container">
-    { children... }
-  </main>
-</body>
-
-</html>
+templ base(loggedIn bool, left_aside templ.Component, right_aside templ.Component) {
+	<html x-data="{ darkMode: false }" x-bind:data-theme="darkMode ? 'dark' : 'light'">
+		<head>
+			<title>Go-Tutorials</title>
+			<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css"/>
+			<link rel="stylesheet" href="/static/style.css"/>
+			<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+			<script defer src="https://cdn.jsdelivr.net/npm/@imacrayon/alpine-ajax@0.12.0/dist/cdn.min.js"></script>
+			<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
+		</head>
+		<body>
+			@navBar(loggedIn)
+			<div class="columns">
+				<div class="column is-3 sticky-left is-hidden-mobile">
+					@left_aside
+				</div>
+				<main id="main-content" class="column">
+					{ children... }
+				</main>
+				<aside class="column is-3 is-hidden-mobile">
+					@right_aside
+				</aside>
+			</div>
+		</body>
+	</html>
 }
 
-templ authButtons() {
-<a class="button is-primary" href="/auth/signup" x-target.replace.push="main-content">
-  <strong>Sign up</strong>
-</a>
-<a class="button is-light" href="/auth/login" x-target.replace.push="main-content">
-  Log in
-</a>
+templ navBar(loggedIn bool) {
+	<div x-data="{ dropdownOpen: false }" class="sticky-top">
+		<nav class="navbar" role="navigation" aria-label="main navigation">
+			<div class="navbar-brand">
+				<a
+					role="button"
+					class="navbar-burger"
+					aria-label="menu"
+					aria-expanded="false"
+					data-target="navbarBasicExample"
+					@click="dropdownOpen = !dropdownOpen;"
+				>
+					<span aria-hidden="true"></span>
+					<span aria-hidden="true"></span>
+					<span aria-hidden="true"></span>
+					<span aria-hidden="true"></span>
+				</a>
+			</div>
+			<div id="navbarBasicExample" class="navbar-menu">
+				<div class="navbar-start">
+					<a class="navbar-item" href="/">
+						<i class="fa-solid fa-house is-size-4"></i>
+					</a>
+					<a class="navbar-item" @click="darkMode = !darkMode">
+						<i class="fa-regular fa-sun is-size-4" x-show="darkMode" x-cloak></i>
+						<i class="fa-regular fa-moon is-size-4" x-show="!darkMode" x-cloak></i>
+					</a>
+				</div>
+				<div class="navbar-end">
+					<div class="navbar-item">
+						<div class="buttons">
+							@authButtons(loggedIn)
+						</div>
+					</div>
+				</div>
+			</div>
+		</nav>
+		<div class="title-header">Go-Tutorials</div>
+		<div class="drop-down" x-show="dropdownOpen">
+			<div class="auth-dropdown">
+				@authButtons(loggedIn)
+			</div>
+		</div>
+	</div>
 }
 
-templ Home() {
-@base() {
-@pageTitle("Home")
+templ authButtons(loggedIn bool) {
+	if (!loggedIn) {
+		<a class="button is-primary" href="/auth/signup">
+			<strong>Sign up</strong>
+		</a>
+		<a class="button is-light" href="/auth/login">
+			Log in
+		</a>
+	} else {
+		<a class="button is-primary" href="/auth/logout">
+			<strong>Logout</strong>
+		</a>
+	}
 }
+
+templ blankAside() {
+	<div></div>
+}
+
+templ Home(loggedIn bool) {
+	@base(loggedIn, blankAside(), blankAside()) {
+		@pageTitle("Home")
+	}
 }
 
 templ pageTitle(title string) {
-<h1 class="is-size-2 has-text-weight-bold has-text-centered">{ title }</h1>
+	<h1 class="is-size-2 has-text-weight-bold has-text-centered">{ title }</h1>
 }
