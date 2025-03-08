@@ -1,0 +1,10 @@
+package templates;
+
+templ Video(videoId int32, videoUrl string) {
+@base(false, blankAside(), blankAside()) {
+@pageTitle("Video")
+<video controls width="100%" aspect-ratio="16:9">
+  <source type="video/mp4" src={ videoUrl } />
+</video>
+}
+}

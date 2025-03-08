@@ -10,3 +10,7 @@ RETURNING id;
 -- name: GetCredentials :one
 SELECT id,password,salt FROM users
 WHERE username = $1;
+
+-- name: GetVidoeUrl :one
+SELECT url FROM videos
+WHERE id = $1 and user_id = $2;

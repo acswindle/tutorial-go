@@ -4,10 +4,25 @@
 
 package database
 
+import (
+	"github.com/jackc/pgx/v5/pgtype"
+)
+
 type User struct {
-	ID       int32
-	Username string
-	Email    string
-	Password []byte
-	Salt     []byte
+	ID        int32
+	Username  string
+	Email     string
+	Password  []byte
+	Salt      []byte
+	CreatedAt pgtype.Timestamp
+	UpdatedAt pgtype.Timestamp
+}
+
+type Video struct {
+	ID        int32
+	UserID    int32
+	Title     []byte
+	Url       string
+	CreatedAt pgtype.Timestamp
+	UpdatedAt pgtype.Timestamp
 }

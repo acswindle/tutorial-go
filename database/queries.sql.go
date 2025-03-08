@@ -28,7 +28,7 @@ func (q *Queries) GetCredentials(ctx context.Context, username string) (GetCrede
 }
 
 const getUser = `-- name: GetUser :one
-SELECT id, username, email, password, salt FROM users
+SELECT id, username, email, password, salt, created_at, updated_at FROM users
 WHERE id = $1
 `
 
@@ -41,8 +41,27 @@ func (q *Queries) GetUser(ctx context.Context, id int32) (User, error) {
 		&i.Email,
 		&i.Password,
 		&i.Salt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
+}
+
+const getVidoeUrl = `-- name: GetVidoeUrl :one
+SELECT url FROM videos
+WHERE id = $1 and user_id = $2
+`
+
+type GetVidoeUrlParams struct {
+	ID     int32
+	UserID int32
+}
+
+func (q *Queries) GetVidoeUrl(ctx context.Context, arg GetVidoeUrlParams) (string, error) {
+	row := q.db.QueryRow(ctx, getVidoeUrl, arg.ID, arg.UserID)
+	var url string
+	err := row.Scan(&url)
+	return url, err
 }
 
 const insertUsers = `-- name: InsertUsers :one
