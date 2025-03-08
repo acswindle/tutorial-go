@@ -211,7 +211,13 @@ func SecurityRoutes(ctx context.Context, queries *database.Queries) {
 	})
 
 	// Render the login page
-	http.HandleFunc("/auth/login", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("GET /auth/login", func(w http.ResponseWriter, r *http.Request) {
 		templates.LogIn().Render(r.Context(), w)
+	})
+
+	// Render handle logout
+	http.HandleFunc("GET /auth/logout", func(w http.ResponseWriter, r *http.Request) {
+		deleteCookie(w, "token")
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 	})
 }
