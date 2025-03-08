@@ -45,6 +45,10 @@ func LogIn() templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, " <form x-cloak action=\"/oauth2/token\" method=\"POST\"><label for=\"username\" class=\"label\">Username</label> <input type=\"text\" name=\"username\" class=\"input\"> <label for=\"password\" class=\"label\">Password</label> <input type=\"password\" name=\"password\" class=\"input\"> <input type=\"hidden\" name=\"grant_type\" value=\"password\"> <button type=\"submit\" class=\"button is-primary\">Log In</button></form>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
 			return nil
 		})
 		templ_7745c5c3_Err = base(false, blankAside(), blankAside()).Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)

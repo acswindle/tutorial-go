@@ -9,6 +9,24 @@ import (
 	"context"
 )
 
+const getCredentials = `-- name: GetCredentials :one
+SELECT id,password,salt FROM users
+WHERE username = $1
+`
+
+type GetCredentialsRow struct {
+	ID       int32
+	Password []byte
+	Salt     []byte
+}
+
+func (q *Queries) GetCredentials(ctx context.Context, username string) (GetCredentialsRow, error) {
+	row := q.db.QueryRow(ctx, getCredentials, username)
+	var i GetCredentialsRow
+	err := row.Scan(&i.ID, &i.Password, &i.Salt)
+	return i, err
+}
+
 const getUser = `-- name: GetUser :one
 SELECT id, username, email, password, salt FROM users
 WHERE id = $1

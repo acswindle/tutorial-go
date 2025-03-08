@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"os"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/acswindle/tutorial-go/database"
@@ -30,7 +29,14 @@ type ResponseToken struct {
 	Expires int    `json:"expires_in"`
 }
 
-func genrateJWT(username string) (ResponseToken, error) {
+type JWTClaims struct {
+	UserId int32 `json:"user_id"`
+	Exp    int64 `json:"exp"`
+	Iat    int64 `json:"iat"`
+	Auth   bool  `json:"authorized"`
+}
+
+func generateJWT(userId int32) (ResponseToken, error) {
 	jwtSecret, secretSet := os.LookupEnv("JWT_SECRET")
 	if !secretSet {
 		return ResponseToken{}, fmt.Errorf("JWT_SECRET not set")
@@ -43,9 +49,8 @@ func genrateJWT(username string) (ResponseToken, error) {
 	if err != nil {
 		return ResponseToken{}, fmt.Errorf("JWT_EXPIRE_TIME must be an integer")
 	}
-	expireTime = expireTime * 3600
 	claims := jwt.MapClaims{
-		"username":   username,
+		"user_id":    userId,
 		"exp":        time.Now().Add(time.Second * time.Duration(expireTime)).Unix(),
 		"iat":        time.Now().Unix(),
 		"authorized": true,
@@ -62,28 +67,18 @@ func genrateJWT(username string) (ResponseToken, error) {
 	}, nil
 }
 
-func ValidateToken(w http.ResponseWriter, r *http.Request) string {
+func ValidateToken(w http.ResponseWriter, r *http.Request) int32 {
 	jwtSecret, secretSet := os.LookupEnv("JWT_SECRET")
 	if !secretSet {
 		http.Error(w, "JWT_SECRET not set", http.StatusInternalServerError)
-		return ""
+		return 0
 	}
-	auth := r.Header.Get("Authorization")
-	if auth == "" {
+	auth, err := r.Cookie("token")
+	if err != nil {
 		http.Error(w, "token not set", http.StatusUnauthorized)
-		return ""
+		return 0
 	}
-	token := strings.Split(auth, " ")
-	if token[0] != "Bearer" {
-		http.Error(w, "token not set", http.StatusUnauthorized)
-		return ""
-	}
-	if len(token) != 2 {
-		http.Error(w, "token not set", http.StatusUnauthorized)
-		return ""
-	}
-
-	tokenClaims, err := jwt.Parse(token[1], func(token *jwt.Token) (interface{}, error) {
+	tokenClaims, err := jwt.Parse(auth.Value, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
@@ -91,26 +86,22 @@ func ValidateToken(w http.ResponseWriter, r *http.Request) string {
 	})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return ""
+		return 0
 	}
 	if claims, ok := tokenClaims.Claims.(jwt.MapClaims); ok && tokenClaims.Valid {
-		return claims["username"].(string)
+		return int32(claims["user_id"].(float64))
 	}
 	http.Error(w, "token not valid", http.StatusUnauthorized)
-	return ""
+	return 0
 }
 
 func SecurityRoutes(ctx context.Context, queries *database.Queries) {
-	// // GET /users
-	// http.HandleFunc("GET /users", func(w http.ResponseWriter, r *http.Request) {
-	// 	users, err := queries.GetUsers(ctx)
-	// 	if err != nil {
-	// 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	// 		return
-	// 	}
-	// 	fmt.Fprint(w, users)
-	// })
-	// POST /user
+	// Render the sign up page
+	http.HandleFunc("/auth/signup", func(w http.ResponseWriter, r *http.Request) {
+		templates.SignUp().Render(r.Context(), w)
+	})
+
+	// Register a new user
 	http.HandleFunc("POST /auth/register", func(w http.ResponseWriter, r *http.Request) {
 		// Parse the form
 		err := r.ParseForm()
@@ -162,54 +153,61 @@ func SecurityRoutes(ctx context.Context, queries *database.Queries) {
 		// Redirect to the login page
 		http.Redirect(w, r, "/auth/login", http.StatusSeeOther)
 	})
-	// http.HandleFunc("/oauth2/token", func(w http.ResponseWriter, r *http.Request) {
-	// 	if err := r.ParseForm(); err != nil {
-	// 		http.Error(w, err.Error(), http.StatusBadRequest)
-	// 		return
-	// 	}
-	// 	if r.Form.Get("grant_type") != "password" {
-	// 		http.Error(w, "grant_type must be password", http.StatusBadRequest)
-	// 		return
-	// 	}
-	// 	username := r.Form.Get("username")
-	// 	password := r.Form.Get("password")
-	// 	if username == "" || password == "" {
-	// 		http.Error(w, "username or password not set", http.StatusBadRequest)
-	// 		return
-	// 	}
-	// 	user, err := queries.GetCredentials(ctx, username)
-	// 	if err != nil {
-	// 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	// 		return
-	// 	}
-	// 	if err := bcrypt.CompareHashAndPassword(user.Hashpassword, append([]byte(password), user.Salt...)); err != nil {
-	// 		http.Error(w, err.Error(), http.StatusUnauthorized)
-	// 		return
-	// 	}
-	// 	token, err := genrateJWT(username)
-	// 	if err != nil {
-	// 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	// 		return
-	// 	}
-	// 	response, err := json.Marshal(token)
-	// 	if err != nil {
-	// 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	// 		return
-	// 	}
-	// 	w.Header().Set("Content-Type", "application/json")
-	// 	w.Header().Set("Cache-Control", "no-store")
-	// 	w.Write(response)
-	// })
-	//
-	// http.HandleFunc("GET /validate", func(w http.ResponseWriter, r *http.Request) {
-	// 	if username := ValidateToken(w, r); username != "" {
-	// 		fmt.Fprint(w, username)
-	// 	}
-	// })
 
-	// Render the sign up page
-	http.HandleFunc("/auth/signup", func(w http.ResponseWriter, r *http.Request) {
-		templates.SignUp().Render(r.Context(), w)
+	// Obtain login token
+	http.HandleFunc("/oauth2/token", func(w http.ResponseWriter, r *http.Request) {
+		// Parse the form
+		if err := r.ParseForm(); err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		if r.Form.Get("grant_type") != "password" {
+			http.Error(w, "grant_type must be password", http.StatusBadRequest)
+			return
+		}
+		username := r.Form.Get("username")
+		password := r.Form.Get("password")
+		if username == "" || password == "" {
+			http.Error(w, "username or password not set", http.StatusBadRequest)
+			return
+		}
+
+		// Get the user
+		user, err := queries.GetCredentials(ctx, username)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		// Compare the password
+		if err := bcrypt.CompareHashAndPassword(user.Password, append([]byte(password), user.Salt...)); err != nil {
+			http.Error(w, err.Error(), http.StatusUnauthorized)
+			return
+		}
+		token, err := generateJWT(user.ID)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		// Set the response
+		cookie := http.Cookie{
+			Name:     "token",
+			Value:    token.Token,
+			SameSite: http.SameSiteLaxMode,
+			HttpOnly: true,
+			Path:     "/",
+		}
+		http.SetCookie(w, &cookie)
+
+		// Redirect to the home page
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+	})
+
+	http.HandleFunc("GET /validate", func(w http.ResponseWriter, r *http.Request) {
+		if username := ValidateToken(w, r); username != 0 {
+			fmt.Fprint(w, username)
+		}
 	})
 
 	// Render the login page

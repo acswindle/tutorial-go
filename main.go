@@ -43,7 +43,17 @@ func main() {
 
 	// Render the home page
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		templates.Home(false).Render(r.Context(), w)
+		var loggedIn bool
+		_, err := r.Cookie("token")
+		if err != nil {
+			loggedIn = false
+		} else if internal.ValidateToken(w, r) == 0 {
+			loggedIn = false
+			return
+		} else {
+			loggedIn = true
+		}
+		templates.Home(loggedIn).Render(r.Context(), w)
 	})
 
 	internal.SecurityRoutes(ctx, queries)
