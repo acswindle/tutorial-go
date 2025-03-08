@@ -1,3 +1,4 @@
 *.env
 /data
 /tmp
+/static/videos/*
