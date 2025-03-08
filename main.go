@@ -6,9 +6,11 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/acswindle/tutorial-go/database"
+	"github.com/acswindle/tutorial-go/internal"
+	"github.com/acswindle/tutorial-go/templates"
 	"github.com/joho/godotenv"
 
-	"github.com/acswindle/tutorial-go/templates"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -25,7 +27,12 @@ func main() {
 		log.Fatal("DATABASE_FILE not set")
 	}
 	ctx := context.Background()
-	pgx.Connect(ctx, dbURL)
+	con, err := pgx.Connect(ctx, dbURL)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer con.Close(ctx)
+	queries := database.New(con)
 
 	// Serve static files
 	http.Handle("/static/",
@@ -39,21 +46,7 @@ func main() {
 		templates.Home(false).Render(r.Context(), w)
 	})
 
-	// Render the sign up page
-	http.HandleFunc("/auth/signup", func(w http.ResponseWriter, r *http.Request) {
-		templates.SignUp().Render(r.Context(), w)
-	})
-
-	// Render the login page
-	http.HandleFunc("/auth/login", func(w http.ResponseWriter, r *http.Request) {
-		templates.LogIn().Render(r.Context(), w)
-	})
-
-	// Render the course home page
-	http.HandleFunc("/course", func(w http.ResponseWriter, r *http.Request) {
-		templates.CourseHome(false).Render(r.Context(), w)
-	})
-
+	internal.SecurityRoutes(ctx, queries)
 	// Start the server
 	println("Listening on port 8080")
 	http.ListenAndServe(":8080", nil)

@@ -3,7 +3,7 @@ package templates;
 templ SignUp() {
 	@base(false, blankAside(), blankAside()) {
 		@pageTitle("Sign Up")
-		<form x-cloak>
+		<form x-cloak action="/auth/register" method="POST">
 			<label for="username" class="label">Username</label>
 			<input type="text" name="username" class="input"/>
 			<label for="email" class="label">Email</label>

@@ -45,7 +45,7 @@ func SignUp() templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, " <form x-cloak><label for=\"username\" class=\"label\">Username</label> <input type=\"text\" name=\"username\" class=\"input\"> <label for=\"email\" class=\"label\">Email</label> <input type=\"email\" name=\"email\" class=\"input\"> <label for=\"password\" class=\"label\">Password</label> <input type=\"password\" name=\"password\" class=\"input\"> <button type=\"submit\" class=\"button is-primary\">Sign Up</button></form>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, " <form x-cloak action=\"/auth/register\" method=\"POST\"><label for=\"username\" class=\"label\">Username</label> <input type=\"text\" name=\"username\" class=\"input\"> <label for=\"email\" class=\"label\">Email</label> <input type=\"email\" name=\"email\" class=\"input\"> <label for=\"password\" class=\"label\">Password</label> <input type=\"password\" name=\"password\" class=\"input\"> <button type=\"submit\" class=\"button is-primary\">Sign Up</button></form>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

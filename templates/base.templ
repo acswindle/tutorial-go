@@ -11,17 +11,19 @@ templ base(loggedIn bool, left_aside templ.Component, right_aside templ.Componen
 			<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
 		</head>
 		<body>
-			@navBar(loggedIn)
-			<div class="columns">
-				<div class="column is-3 sticky-left is-hidden-mobile">
-					@left_aside
+			<div id="page-contents">
+				@navBar(loggedIn)
+				<div class="columns">
+					<div class="column is-3 sticky-left is-hidden-mobile">
+						@left_aside
+					</div>
+					<main id="main-content" class="column">
+						{ children... }
+					</main>
+					<aside class="column is-3 is-hidden-mobile">
+						@right_aside
+					</aside>
 				</div>
-				<main id="main-content" class="column">
-					{ children... }
-				</main>
-				<aside class="column is-3 is-hidden-mobile">
-					@right_aside
-				</aside>
 			</div>
 		</body>
 	</html>
@@ -47,7 +49,7 @@ templ navBar(loggedIn bool) {
 			</div>
 			<div id="navbarBasicExample" class="navbar-menu">
 				<div class="navbar-start">
-					<a class="navbar-item" href="/">
+					<a class="navbar-item" href="/" x-target.push="page-contents">
 						<i class="fa-solid fa-house is-size-4"></i>
 					</a>
 					<a class="navbar-item" @click="darkMode = !darkMode">
@@ -75,14 +77,14 @@ templ navBar(loggedIn bool) {
 
 templ authButtons(loggedIn bool) {
 	if (!loggedIn) {
-		<a class="button is-primary" href="/auth/signup">
+		<a class="button is-primary" href="/auth/signup" x-target.push="page-contents">
 			<strong>Sign up</strong>
 		</a>
-		<a class="button is-light" href="/auth/login">
+		<a class="button is-light" href="/auth/login" x-target.push="page-contents">
 			Log in
 		</a>
 	} else {
-		<a class="button is-primary" href="/auth/logout">
+		<a class="button is-primary" href="/auth/logout" x-target.push="page-contents">
 			<strong>Logout</strong>
 		</a>
 	}

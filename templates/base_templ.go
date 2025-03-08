@@ -29,7 +29,7 @@ func base(loggedIn bool, left_aside templ.Component, right_aside templ.Component
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<html x-data=\"{ darkMode: false }\" x-bind:data-theme=\"darkMode ? &#39;dark&#39; : &#39;light&#39;\"><head><title>Go-Tutorials</title><link rel=\"stylesheet\" href=\"https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css\"><link rel=\"stylesheet\" href=\"/static/style.css\"><link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css\"><script defer src=\"https://cdn.jsdelivr.net/npm/@imacrayon/alpine-ajax@0.12.0/dist/cdn.min.js\"></script><script defer src=\"https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js\"></script></head><body>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<html x-data=\"{ darkMode: false }\" x-bind:data-theme=\"darkMode ? &#39;dark&#39; : &#39;light&#39;\"><head><title>Go-Tutorials</title><link rel=\"stylesheet\" href=\"https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css\"><link rel=\"stylesheet\" href=\"/static/style.css\"><link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css\"><script defer src=\"https://cdn.jsdelivr.net/npm/@imacrayon/alpine-ajax@0.12.0/dist/cdn.min.js\"></script><script defer src=\"https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js\"></script></head><body><div id=\"page-contents\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -61,7 +61,7 @@ func base(loggedIn bool, left_aside templ.Component, right_aside templ.Component
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</aside></div></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</aside></div></div></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -90,7 +90,7 @@ func navBar(loggedIn bool) templ.Component {
 			templ_7745c5c3_Var2 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<div x-data=\"{ dropdownOpen: false }\" class=\"sticky-top\"><nav class=\"navbar\" role=\"navigation\" aria-label=\"main navigation\"><div class=\"navbar-brand\"><a role=\"button\" class=\"navbar-burger\" aria-label=\"menu\" aria-expanded=\"false\" data-target=\"navbarBasicExample\" @click=\"dropdownOpen = !dropdownOpen;\"><span aria-hidden=\"true\"></span> <span aria-hidden=\"true\"></span> <span aria-hidden=\"true\"></span> <span aria-hidden=\"true\"></span></a></div><div id=\"navbarBasicExample\" class=\"navbar-menu\"><div class=\"navbar-start\"><a class=\"navbar-item\" href=\"/\"><i class=\"fa-solid fa-house is-size-4\"></i></a> <a class=\"navbar-item\" @click=\"darkMode = !darkMode\"><i class=\"fa-regular fa-sun is-size-4\" x-show=\"darkMode\" x-cloak></i> <i class=\"fa-regular fa-moon is-size-4\" x-show=\"!darkMode\" x-cloak></i></a></div><div class=\"navbar-end\"><div class=\"navbar-item\"><div class=\"buttons\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<div x-data=\"{ dropdownOpen: false }\" class=\"sticky-top\"><nav class=\"navbar\" role=\"navigation\" aria-label=\"main navigation\"><div class=\"navbar-brand\"><a role=\"button\" class=\"navbar-burger\" aria-label=\"menu\" aria-expanded=\"false\" data-target=\"navbarBasicExample\" @click=\"dropdownOpen = !dropdownOpen;\"><span aria-hidden=\"true\"></span> <span aria-hidden=\"true\"></span> <span aria-hidden=\"true\"></span> <span aria-hidden=\"true\"></span></a></div><div id=\"navbarBasicExample\" class=\"navbar-menu\"><div class=\"navbar-start\"><a class=\"navbar-item\" href=\"/\" x-target.push=\"page-contents\"><i class=\"fa-solid fa-house is-size-4\"></i></a> <a class=\"navbar-item\" @click=\"darkMode = !darkMode\"><i class=\"fa-regular fa-sun is-size-4\" x-show=\"darkMode\" x-cloak></i> <i class=\"fa-regular fa-moon is-size-4\" x-show=\"!darkMode\" x-cloak></i></a></div><div class=\"navbar-end\"><div class=\"navbar-item\"><div class=\"buttons\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -136,12 +136,12 @@ func authButtons(loggedIn bool) templ.Component {
 		}
 		ctx = templ.ClearChildren(ctx)
 		if !loggedIn {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<a class=\"button is-primary\" href=\"/auth/signup\"><strong>Sign up</strong></a> <a class=\"button is-light\" href=\"/auth/login\">Log in</a>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<a class=\"button is-primary\" href=\"/auth/signup\" x-target.push=\"page-contents\"><strong>Sign up</strong></a> <a class=\"button is-light\" href=\"/auth/login\" x-target.push=\"page-contents\">Log in</a>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<a class=\"button is-primary\" href=\"/auth/logout\"><strong>Logout</strong></a>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<a class=\"button is-primary\" href=\"/auth/logout\" x-target.push=\"page-contents\"><strong>Logout</strong></a>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -254,7 +254,7 @@ func pageTitle(title string) templ.Component {
 		var templ_7745c5c3_Var8 string
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/base.templ`, Line: 102, Col: 69}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/base.templ`, Line: 104, Col: 69}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
