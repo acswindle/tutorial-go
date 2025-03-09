@@ -18,3 +18,7 @@ WHERE id = $1;
 -- name: GetVidoeUrl :one
 SELECT url FROM videos
 WHERE id = $1 and user_id = $2;
+
+-- name: ListVideos :many
+SELECT id, title FROM videos
+WHERE user_id = $1;

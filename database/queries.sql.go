@@ -106,3 +106,33 @@ func (q *Queries) InsertUsers(ctx context.Context, arg InsertUsersParams) (int32
 	err := row.Scan(&id)
 	return id, err
 }
+
+const listVideos = `-- name: ListVideos :many
+SELECT id, title FROM videos
+WHERE user_id = $1
+`
+
+type ListVideosRow struct {
+	ID    int32
+	Title []byte
+}
+
+func (q *Queries) ListVideos(ctx context.Context, userID int32) ([]ListVideosRow, error) {
+	rows, err := q.db.Query(ctx, listVideos, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListVideosRow
+	for rows.Next() {
+		var i ListVideosRow
+		if err := rows.Scan(&i.ID, &i.Title); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}

@@ -45,15 +45,20 @@ func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		_, err := r.Cookie("token")
 		if err != nil {
-			templates.Home(false).Render(r.Context(), w)
+			templates.Home(false, nil).Render(r.Context(), w)
 			return
 		}
-		_, err = internal.ValidateToken(w, r)
+		token, err := internal.ValidateToken(w, r)
 		if err != nil {
-			templates.Home(false).Render(r.Context(), w)
+			templates.Home(false, nil).Render(r.Context(), w)
 			return
 		}
-		templates.Home(true).Render(r.Context(), w)
+		videos, err := queries.ListVideos(ctx, token.UserId)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		templates.Home(true, videos).Render(r.Context(), w)
 	})
 
 	internal.SecurityRoutes(ctx, queries)
