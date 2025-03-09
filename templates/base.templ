@@ -1,10 +1,5 @@
 package templates
 
-import (
-"fmt"
-"github.com/acswindle/tutorial-go/database"
-)
-
 templ base(loggedIn bool, left_aside templ.Component, right_aside templ.Component) {
 <html x-data="{ darkMode: false }" x-bind:data-theme="darkMode ? 'dark' : 'light'">
 
@@ -86,6 +81,9 @@ if (!loggedIn) {
   Log in
 </a>
 } else {
+<a class="button" href="/video/upload" x-target.push="page-contents">
+  <strong>Upload Video</strong>
+</a>
 <a class="button is-primary" href="/auth/logout" x-target.push="page-contents">
   <strong>Logout</strong>
 </a>
@@ -94,17 +92,6 @@ if (!loggedIn) {
 
 templ blankAside() {
 <div></div>
-}
-
-templ Home(loggedIn bool, videos []database.ListVideosRow) {
-@base(loggedIn, blankAside(), blankAside()) {
-@pageTitle("Home")
-<ul>
-  for _, video := range videos {
-  <li><a href={ templ.URL(fmt.Sprintf("/video/%d", video.ID)) }>{ string(video.Title) }</a></li>
-  }
-</ul>
-}
 }
 
 templ pageTitle(title string) {

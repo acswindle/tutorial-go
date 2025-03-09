@@ -10,6 +10,16 @@ import (
 )
 
 func VideoRoutes(ctx context.Context, queries *database.Queries) {
+	// Render the upload video page
+	http.HandleFunc("GET /video/upload", func(w http.ResponseWriter, r *http.Request) {
+		_, err := ValidateToken(w, r)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusUnauthorized)
+			return
+		}
+		templates.UploadVideo().Render(r.Context(), w)
+	})
+
 	// Render the video page
 	http.HandleFunc("GET /video/{id}", func(w http.ResponseWriter, r *http.Request) {
 		videoId, err := strconv.ParseInt(r.PathValue("id"), 10, 32)

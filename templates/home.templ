@@ -1,0 +1,18 @@
+package templates;
+
+import (
+"fmt"
+"github.com/acswindle/tutorial-go/database"
+)
+
+templ Home(loggedIn bool, videos []database.ListVideosRow) {
+@base(loggedIn, blankAside(), blankAside()) {
+@pageTitle("Home")
+<ul>
+  for _, video := range videos {
+  <li><a href={ templ.URL(fmt.Sprintf("/video/%d", video.ID)) } x-target.push="page-contents">{ string(video.Title)
+      }</a></li>
+  }
+</ul>
+}
+}
