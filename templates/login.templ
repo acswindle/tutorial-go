@@ -1,10 +1,14 @@
 package templates;
 
-templ LogIn() {
+templ LogIn(errorMessage string) {
 	@base(false, blankAside(), blankAside()) {
 		@pageTitle("Log In")
-		<form x-cloak action="/oauth2/token" method="POST">
+		<form id="form" x-cloak action="/oauth2/token" method="POST" x-target="form" x-target.away="_top">
+			<p class="help is-danger">{ errorMessage }</p>
 			<label for="username" class="label">Username</label>
+			if errorMessage != "" {
+			}
+			<p class="help is-danger"></p>
 			<input type="text" name="username" class="input"/>
 			<label for="password" class="label">Password</label>
 			<input type="password" name="password" class="input"/>

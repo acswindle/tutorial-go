@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/aes"
 	"crypto/cipher"
-	"crypto/pbkdf2"
 	"crypto/rand"
 	"crypto/sha256"
 	"fmt"
@@ -13,6 +12,8 @@ import (
 	"os"
 	"strconv"
 	"time"
+
+	"golang.org/x/crypto/pbkdf2"
 
 	"github.com/acswindle/tutorial-go/database"
 	"github.com/acswindle/tutorial-go/templates"
@@ -159,7 +160,6 @@ func ValidateToken(w http.ResponseWriter, r *http.Request) (JWTClaims, error) {
 		http.Error(w, "token not valid", http.StatusUnauthorized)
 		return JWTClaims{}, fmt.Errorf("token not valid")
 	}
-	http.Error(w, "token not valid", http.StatusUnauthorized)
 	return tokenClaims, nil
 }
 
@@ -236,20 +236,20 @@ func SecurityRoutes(ctx context.Context, queries *database.Queries) {
 		username := r.Form.Get("username")
 		password := r.Form.Get("password")
 		if username == "" || password == "" {
-			http.Error(w, "username or password not set", http.StatusBadRequest)
+			templates.LogIn("Username or password not set").Render(r.Context(), w)
 			return
 		}
 
 		// Get the user
 		user, err := queries.GetCredentials(ctx, username)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			templates.LogIn("Invalid username or password").Render(r.Context(), w)
 			return
 		}
 
 		// Compare the password
 		if err := bcrypt.CompareHashAndPassword(user.Password, append([]byte(password), user.Salt...)); err != nil {
-			http.Error(w, err.Error(), http.StatusUnauthorized)
+			templates.LogIn("Invalid username or password").Render(r.Context(), w)
 			return
 		}
 		token, err := generateJWT(user)
@@ -274,7 +274,7 @@ func SecurityRoutes(ctx context.Context, queries *database.Queries) {
 
 	// Render the login page
 	http.HandleFunc("GET /auth/login", func(w http.ResponseWriter, r *http.Request) {
-		templates.LogIn().Render(r.Context(), w)
+		templates.LogIn("").Render(r.Context(), w)
 	})
 
 	// Render handle logout

@@ -8,7 +8,7 @@ package templates
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-func LogIn() templ.Component {
+func LogIn(errorMessage string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -45,7 +45,26 @@ func LogIn() templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, " <form x-cloak action=\"/oauth2/token\" method=\"POST\"><label for=\"username\" class=\"label\">Username</label> <input type=\"text\" name=\"username\" class=\"input\"> <label for=\"password\" class=\"label\">Password</label> <input type=\"password\" name=\"password\" class=\"input\"> <input type=\"hidden\" name=\"grant_type\" value=\"password\"> <button type=\"submit\" class=\"button is-primary\">Log In</button></form>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, " <form id=\"form\" x-cloak action=\"/oauth2/token\" method=\"POST\" x-target=\"form\" x-target.away=\"_top\"><p class=\"help is-danger\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var3 string
+			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(errorMessage)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/login.templ`, Line: 7, Col: 43}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</p><label for=\"username\" class=\"label\">Username</label> ")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			if errorMessage != "" {
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<p class=\"help is-danger\"></p><input type=\"text\" name=\"username\" class=\"input\"> <label for=\"password\" class=\"label\">Password</label> <input type=\"password\" name=\"password\" class=\"input\"> <input type=\"hidden\" name=\"grant_type\" value=\"password\"> <button type=\"submit\" class=\"button is-primary\">Log In</button></form>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
