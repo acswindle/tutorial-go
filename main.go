@@ -58,6 +58,16 @@ func main() {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+		for i, video := range videos {
+			title, err := internal.Decrypt(token.DeriveKey, internal.EncryptedData{
+				Nonce:      video.Nonce,
+				Ciphertext: video.Title,
+			})
+			if err != nil {
+				continue
+			}
+			videos[i].Title = title
+		}
 		templates.Home(true, videos).Render(r.Context(), w)
 	})
 

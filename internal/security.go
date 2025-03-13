@@ -81,7 +81,7 @@ func encrypt(key, plaintext []byte) (EncryptedData, error) {
 }
 
 // decrypt decrypts ciphertext using AES-GCM
-func decrypt(key []byte, data EncryptedData) ([]byte, error) {
+func Decrypt(key []byte, data EncryptedData) ([]byte, error) {
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return nil, err

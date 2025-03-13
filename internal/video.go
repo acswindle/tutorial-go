@@ -2,6 +2,7 @@ package internal
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -32,15 +33,34 @@ func VideoRoutes(ctx context.Context, queries *database.Queries) {
 			http.Error(w, err.Error(), http.StatusUnauthorized)
 			return
 		}
-		url, err := queries.GetVidoeUrl(ctx, database.GetVidoeUrlParams{ID: int32(videoId), UserID: token.UserId})
+		url, err := queries.GetVideoUrl(ctx, database.GetVideoUrlParams{ID: int32(videoId), UserID: token.UserId})
 		if err != nil {
 			http.Error(w, "video not found", http.StatusNotFound)
 			return
 		}
-		if url == "" {
-			http.Error(w, "video not found", http.StatusNotFound)
+		templates.Video(int32(videoId), url.String()).Render(r.Context(), w)
+	})
+	http.HandleFunc("POST /video/upload", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println("POST /video/upload")
+		token, err := ValidateToken(w, r)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusUnauthorized)
 			return
 		}
-		templates.Video(int32(videoId), url).Render(r.Context(), w)
+		title, err := encrypt(token.DeriveKey, []byte(r.FormValue("title")))
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		err = queries.InsertVideo(ctx, database.InsertVideoParams{
+			UserID: token.UserId,
+			Title:  title.Ciphertext,
+			Nonce:  title.Nonce,
+		})
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 	})
 }

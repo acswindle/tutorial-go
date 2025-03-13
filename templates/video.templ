@@ -1,23 +1,23 @@
 package templates;
 
 templ Video(videoId int32, videoUrl string) {
-	@base(false, blankAside(), blankAside()) {
-		@pageTitle("Video")
-		<video controls width="100%" aspect-ratio="16:9">
-			<source type="video/mp4" src={ videoUrl }/>
-		</video>
-	}
+@base(false, blankAside(), blankAside()) {
+@pageTitle("Video")
+<video controls width="100%" aspect-ratio="16:9">
+  <source type="video/mp4" src={ videoUrl } />
+</video>
+}
 }
 
 templ UploadVideo() {
-	@base(false, blankAside(), blankAside()) {
-		@pageTitle("Upload Video")
-		<form x-cloak action="/video/upload" method="POST">
-			<label for="title" class="label">Title</label>
-			<input type="text" name="title" class="input"/>
-			<label for="video" class="label">Video</label>
-			<input type="file" name="video" class="input"/>
-			<button type="submit" class="button is-primary">Upload</button>
-		</form>
-	}
+@base(true, blankAside(), blankAside()) {
+@pageTitle("Upload Video")
+<form x-cloak action="/video/upload" method="post">
+  <label for="title" class="label">Title</label>
+  <input type="text" name="title" class="input" />
+  <label for="video" class="label">Video</label>
+  <input type="file" name="video" class="input" accept="video/mp4, video/quicktime, video/webm" />
+  <button type="submit" class="button is-primary">Upload</button>
+</form>
+}
 }

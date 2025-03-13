@@ -8,11 +8,21 @@ import (
 templ Home(loggedIn bool, videos []database.ListVideosRow) {
 @base(loggedIn, blankAside(), blankAside()) {
 @pageTitle("Home")
-<ul>
+if loggedIn {
+@ListVideos(videos)
+}
+}
+}
+
+templ ListVideos(videos []database.ListVideosRow) {
+<h2 class="is-size-2">Your Videos</h2>
+<ul class="is-size-3">
   for _, video := range videos {
-  <li><a href={ templ.URL(fmt.Sprintf("/video/%d", video.ID)) } x-target.push="page-contents">{ string(video.Title)
-      }</a></li>
+  <li>
+    <a href={ templ.URL(fmt.Sprintf("/video/%d", video.ID)) } x-target.push="page-contents">
+      { string(video.Title) }
+    </a>
+  </li>
   }
 </ul>
-}
 }

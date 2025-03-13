@@ -52,7 +52,7 @@ func Video(videoId int32, videoUrl string) templ.Component {
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(videoUrl)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/video.templ`, Line: 7, Col: 42}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/video.templ`, Line: 7, Col: 41}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -109,13 +109,13 @@ func UploadVideo() templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, " <form x-cloak action=\"/video/upload\" method=\"POST\"><label for=\"title\" class=\"label\">Title</label> <input type=\"text\" name=\"title\" class=\"input\"> <label for=\"video\" class=\"label\">Video</label> <input type=\"file\" name=\"video\" class=\"input\"> <button type=\"submit\" class=\"button is-primary\">Upload</button></form>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, " <form x-cloak action=\"/video/upload\" method=\"post\"><label for=\"title\" class=\"label\">Title</label> <input type=\"text\" name=\"title\" class=\"input\"> <label for=\"video\" class=\"label\">Video</label> <input type=\"file\" name=\"video\" class=\"input\" accept=\"video/mp4, video/quicktime, video/webm\"> <button type=\"submit\" class=\"button is-primary\">Upload</button></form>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			return nil
 		})
-		templ_7745c5c3_Err = base(false, blankAside(), blankAside()).Render(templ.WithChildren(ctx, templ_7745c5c3_Var5), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = base(true, blankAside(), blankAside()).Render(templ.WithChildren(ctx, templ_7745c5c3_Var5), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

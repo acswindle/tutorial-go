@@ -1,3 +1,3 @@
  <video controls width=\"100%\" aspect-ratio=\"16:9\"><source type=\"video/mp4\" src=\"
 \"></video>
- <form x-cloak action=\"/video/upload\" method=\"POST\"><label for=\"title\" class=\"label\">Title</label> <input type=\"text\" name=\"title\" class=\"input\"> <label for=\"video\" class=\"label\">Video</label> <input type=\"file\" name=\"video\" class=\"input\"> <button type=\"submit\" class=\"button is-primary\">Upload</button></form>
+ <form x-cloak action=\"/video/upload\" method=\"post\"><label for=\"title\" class=\"label\">Title</label> <input type=\"text\" name=\"title\" class=\"input\"> <label for=\"video\" class=\"label\">Video</label> <input type=\"file\" name=\"video\" class=\"input\" accept=\"video/mp4, video/quicktime, video/webm\"> <button type=\"submit\" class=\"button is-primary\">Upload</button></form>

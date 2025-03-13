@@ -7,6 +7,8 @@ package database
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const getCredentials = `-- name: GetCredentials :one
@@ -65,19 +67,19 @@ func (q *Queries) GetUser(ctx context.Context, id int32) (User, error) {
 	return i, err
 }
 
-const getVidoeUrl = `-- name: GetVidoeUrl :one
+const getVideoUrl = `-- name: GetVideoUrl :one
 SELECT url FROM videos
 WHERE id = $1 and user_id = $2
 `
 
-type GetVidoeUrlParams struct {
+type GetVideoUrlParams struct {
 	ID     int32
 	UserID int32
 }
 
-func (q *Queries) GetVidoeUrl(ctx context.Context, arg GetVidoeUrlParams) (string, error) {
-	row := q.db.QueryRow(ctx, getVidoeUrl, arg.ID, arg.UserID)
-	var url string
+func (q *Queries) GetVideoUrl(ctx context.Context, arg GetVideoUrlParams) (pgtype.UUID, error) {
+	row := q.db.QueryRow(ctx, getVideoUrl, arg.ID, arg.UserID)
+	var url pgtype.UUID
 	err := row.Scan(&url)
 	return url, err
 }
@@ -107,14 +109,30 @@ func (q *Queries) InsertUsers(ctx context.Context, arg InsertUsersParams) (int32
 	return id, err
 }
 
+const insertVideo = `-- name: InsertVideo :exec
+INSERT INTO videos (user_id,title,nonce) values ($1, $2, $3)
+`
+
+type InsertVideoParams struct {
+	UserID int32
+	Title  []byte
+	Nonce  []byte
+}
+
+func (q *Queries) InsertVideo(ctx context.Context, arg InsertVideoParams) error {
+	_, err := q.db.Exec(ctx, insertVideo, arg.UserID, arg.Title, arg.Nonce)
+	return err
+}
+
 const listVideos = `-- name: ListVideos :many
-SELECT id, title FROM videos
+SELECT id, title, nonce FROM videos
 WHERE user_id = $1
 `
 
 type ListVideosRow struct {
 	ID    int32
 	Title []byte
+	Nonce []byte
 }
 
 func (q *Queries) ListVideos(ctx context.Context, userID int32) ([]ListVideosRow, error) {
@@ -126,7 +144,7 @@ func (q *Queries) ListVideos(ctx context.Context, userID int32) ([]ListVideosRow
 	var items []ListVideosRow
 	for rows.Next() {
 		var i ListVideosRow
-		if err := rows.Scan(&i.ID, &i.Title); err != nil {
+		if err := rows.Scan(&i.ID, &i.Title, &i.Nonce); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

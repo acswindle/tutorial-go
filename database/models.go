@@ -19,10 +19,12 @@ type User struct {
 }
 
 type Video struct {
-	ID        int32
-	UserID    int32
-	Title     []byte
-	Url       string
-	CreatedAt pgtype.Timestamp
-	UpdatedAt pgtype.Timestamp
+	ID             int32
+	UserID         int32
+	Title          []byte
+	Nonce          []byte
+	Url            pgtype.UUID
+	UploadComplete pgtype.Bool
+	CreatedAt      pgtype.Timestamp
+	UpdatedAt      pgtype.Timestamp
 }
